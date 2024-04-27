@@ -2,7 +2,7 @@
  * @Author: kasuie
  * @Date: 2024-04-26 11:51:38
  * @LastEditors: kasuie
- * @LastEditTime: 2024-04-26 16:49:53
+ * @LastEditTime: 2024-04-27 17:24:23
  * @Description:
  */
 /** @type {import('next').NextConfig} */
@@ -33,6 +33,10 @@ const nextConfig = {
       {
         source: "/bapi/:path*",
         destination: "https://api.bgm.tv/:path*",
+      },
+      {
+        source: "/bpic/:path*",
+        destination: "http://lain.bgm.tv/:path*",
       },
     ];
     return {
