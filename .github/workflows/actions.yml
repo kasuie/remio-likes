@@ -1,0 +1,54 @@
+name: Remio Likes Docker Image CI
+on:
+  push:
+    branches: [main]
+
+  workflow_dispatch:
+
+jobs: # 执行的一项或 多项任务
+  build-and-push:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20.x]
+    steps:
+      - name: Set state
+        run: |
+          echo "DOCKER_NAMESPACE=kasuie" >> $GITHUB_ENV
+          echo "IMAGE_NAME=image-web-likes" >> $GITHUB_ENV
+          echo "IMAGE_TAG=${{secrets.ALI_DOCKER_REGISTRY}}:${{github.sha}}" >> $GITHUB_ENV
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Login to Ali Docker
+        uses: aliyun/acr-login@v1
+        with:
+          login-server: ${{secrets.ALI_DOCKER_REGISTRY}}
+          username: ${{secrets.ALI_DOCKER_USERNAME}}
+          password: ${{secrets.ALI_DOCKER_PASSWORD}}
+      - name: Build and push Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          file: ./Dockerfile
+          push: true
+          tags: ${{env.IMAGE_TAG}}
+  pull-and-restart:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set state
+        run: |
+          echo "DOCKER_NAMESPACE=kasuie" >> $GITHUB_ENV
+          echo "IMAGE_NAME=image-web-likes" >> $GITHUB_ENV
+          echo "IMAGE_TAG=${{secrets.ALI_DOCKER_REGISTRY}}:${{github.sha}}" >> $GITHUB_ENV
+      - name: Login Server and Start
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USERNAME }}
+          key: ${{ secrets.PRIVATE_KEY }}
+          script: |
+            cd /usr/local/docker/web/
+            docker login -u=${{secrets.ALI_DOCKER_USERNAME}} -p=${{secrets.ALI_DOCKER_PASSWORD}} ${{secrets.ALI_DOCKER_REGISTRY}}
+            docker stop web-likes && docker rm web-likes
+            docker image rm $(docker image ls ${{secrets.ALI_DOCKER_REGISTRY}} -q) || echo "删除镜像异常"
+            docker run --name web-likes -p 3003:3000 --env-file .env -d ${{env.IMAGE_TAG}}

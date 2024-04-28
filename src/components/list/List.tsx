@@ -2,7 +2,7 @@
  * @Author: kasuie
  * @Date: 2024-04-26 14:55:29
  * @LastEditors: kasuie
- * @LastEditTime: 2024-04-28 18:05:24
+ * @LastEditTime: 2024-04-28 20:55:50
  * @Description:
  */
 "use client";
@@ -21,10 +21,19 @@ import { Input } from "@nextui-org/input";
 import { clsx, storage } from "@kasuie/utils";
 import request from "@/lib/fetch";
 import { convertAllImagesToBase64, download } from "@/lib/utils";
-import { Search, Image as ImageIcon, Download, Share, Anima } from "../icon";
+import {
+  Search,
+  Image as ImageIcon,
+  Download,
+  Share,
+  Anima,
+  SearchIcon,
+} from "../icon";
 import html2canvas from "html2canvas";
+import { Loader } from "../loader/Loader";
+import { ListItem } from "@/types/global";
 
-export const List = ({ data }: { data: any }) => {
+export const List = ({ allList }: { allList: Array<ListItem> }) => {
   const [aData, setAData] = useState([
     { label: "入坑作" },
     { label: "最喜欢" },
@@ -46,11 +55,16 @@ export const List = ({ data }: { data: any }) => {
   const remioLikesRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsopen] = useState(false);
   const [isResult, setIsResult] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState("");
   const [active, setActive]: any = useState();
   const [searchData, setSearchData]: Array<any> = useState();
   const [temp, setTemp]: any = useState({ id: null });
   const [keywords, setKeywords] = useState("");
+
+  useEffect(() => {
+    console.log(allList);
+  }, [allList]);
 
   const onClose = () => {
     setIsopen(false);
@@ -65,8 +79,12 @@ export const List = ({ data }: { data: any }) => {
   const onSearch = (key: string) => {
     if (!keywords) return;
     if (key === "Enter") {
+      setIsLoading(true);
       request
-        .get(`/bapi/search/subject/${keywords}?type=2&responseGroup=small`)
+        .get(`/bapi/search/subject/${keywords}`, {
+          type: 2,
+          responseGroup: "small",
+        })
         .then((res: any) => {
           const { results, list } = res;
           setSearchData(
@@ -90,12 +108,13 @@ export const List = ({ data }: { data: any }) => {
               };
             }) || []
           );
-        });
+        })
+        .finally(() => setIsLoading(false));
     }
   };
 
   const toImage = () => {
-    if (result) setIsopen(true);
+    if (result && temp) setIsopen(true);
     remioLikesRef.current &&
       html2canvas(remioLikesRef.current, {
         allowTaint: true,
@@ -113,7 +132,7 @@ export const List = ({ data }: { data: any }) => {
   return (
     <div ref={remioLikesRef} className="p-4 mx-auto w-full md:w-3/5 h-full">
       <div>
-        <h1 className="text-5xl font-extrabold py-8 text-center">
+        <h1 className="text-5xl font-extrabold pt-4 pb-12 text-center">
           游戏生涯个人喜好表
         </h1>
         <ul className="grid grid-cols-2 md:grid-cols-5 gap-4 w-full">
@@ -178,15 +197,14 @@ export const List = ({ data }: { data: any }) => {
                   <ModalBody>
                     <div>
                       <Input
-                        isClearable
                         variant="faded"
                         value={keywords}
                         classNames={{
                           label: "text-black/50 dark:text-white/90",
                           input: [
                             "bg-transparent",
-                            "text-black/90 dark:text-white/90",
-                            "placeholder:text-default-700/50 dark:placeholder:text-white/60",
+                            "text-mio-text-default/90",
+                            "placeholder:text-mio-text-default/60",
                           ],
                           innerWrapper: "bg-transparent",
                           inputWrapper: [
@@ -208,11 +226,10 @@ export const List = ({ data }: { data: any }) => {
                         onKeyDown={({ key }: any) => onSearch(key)}
                         onBlur={() => onSearch("Enter")}
                         onValueChange={setKeywords}
-                        // description={"dsdas"}
                       />
                     </div>
                     <div className="w-full flex flex-wrap">
-                      {(searchData &&
+                      {searchData ? (
                         searchData.map((v: any, index: number) => {
                           return (
                             <div
@@ -247,7 +264,10 @@ export const List = ({ data }: { data: any }) => {
                               </div>
                             </div>
                           );
-                        })) || <div>无数据~</div>}
+                        })
+                      ) : isLoading ? (
+                        <Loader />
+                      ) : null}
                     </div>
                   </ModalBody>
                   <ModalFooter>

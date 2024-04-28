@@ -2,7 +2,7 @@
  * @Author: kasuie
  * @Date: 2024-04-26 11:51:38
  * @LastEditors: kasuie
- * @LastEditTime: 2024-04-27 12:06:56
+ * @LastEditTime: 2024-04-28 19:17:35
  * @Description:
  */
 import type { Config } from "tailwindcss";
@@ -34,6 +34,7 @@ const config: Config = {
       colors: {
         "mio-main": "rgba(var(--mio-main))",
         "mio-bg": "rgba(var(--mio-bg))",
+        "mio-content": "rgba(var(--mio-text-default))",
       },
       textColor: {
         "mio-text-color": "rgba(var(--mio-text-color))",
