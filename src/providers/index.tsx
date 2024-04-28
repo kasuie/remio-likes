@@ -2,7 +2,7 @@
  * @Author: kasuie
  * @Date: 2024-04-26 14:08:55
  * @LastEditors: kasuie
- * @LastEditTime: 2024-04-26 14:42:34
+ * @LastEditTime: 2024-04-28 15:54:26
  * @Description:
  */
 "use client";
@@ -23,7 +23,7 @@ export function AppProviders({
       navigate={router.push}
       className="relative flex h-screen flex-col"
     >
-      <ThemeProvider key="themeProvider" defaultTheme="dark" enableSystem>
+      <ThemeProvider key="themeProvider" defaultTheme="light" enableSystem>
         {children}
       </ThemeProvider>
     </NextUIProvider>

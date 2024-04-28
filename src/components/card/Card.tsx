@@ -2,11 +2,12 @@
  * @Author: kasuie
  * @Date: 2024-04-26 15:13:38
  * @LastEditors: kasuie
- * @LastEditTime: 2024-04-28 11:56:15
+ * @LastEditTime: 2024-04-28 17:43:33
  * @Description:
  */
 import { Image } from "@nextui-org/image";
 import { useEffect } from "react";
+import { Game } from "../icon";
 export const Card = ({
   data,
   onSelect,
@@ -22,9 +23,9 @@ export const Card = ({
     }
   }, [data]);
   return (
-    <li className="flex flex-col justify-between border-4 border-black rounded-xl bg-white/15 h-64 w-40 relative">
+    <li className="flex overflow-hidden flex-col gap-1 justify-between border-4 border-[rgba(var(--mio-text-default))] rounded-xl bg-mio-main/15 h-72 relative">
       <div
-        className={`flex flex-1`}
+        className={`flex justify-center group items-center cursor-pointer flex-1 overflow-hidden`}
         style={{
           maxHeight: "calc(100% - 36px)",
           // backgroundImage: `url(${data?.images?.large})`,
@@ -34,18 +35,23 @@ export const Card = ({
           onSelect?.();
         }}
       >
-        {data?.images?.large && (
+        {data?.images?.large ? (
           <Image
-            className="h-full object-cover cursor-pointer w-full"
+            className="h-full object-cover w-full"
             classNames={{
               wrapper: "!max-w-none w-full",
             }}
-            src={data?.images?.large}
+            radius="none"
+            src={data?.images?.common}
             alt={data?.name || data.label}
           />
+        ) : (
+          <div className="flex items-center duration-300 rounded-full justify-center w-10 h-10 bg-black/20 group-hover:bg-black/40">
+            <Game />
+          </div>
         )}
       </div>
-      <div className="text-center text-lg py-1">{data.label}</div>
+      <div className="text-center text-lg mb-2">{data.label}</div>
     </li>
   );
 };

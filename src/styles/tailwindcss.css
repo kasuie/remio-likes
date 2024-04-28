@@ -3,6 +3,28 @@
 @tailwind utilities;
 
 @layer utilities {
+  .mio-scroll {
+    &::-webkit-scrollbar {
+      /*滚动条整体样式*/
+      @apply w-[4px] duration-300 ease-in-out transition-all;
+    }
+    &::-webkit-scrollbar-thumb {
+      /*滚动条里面小方块*/
+      @apply cursor-pointer rounded-lg duration-150;
+      background: rgba(var(--mio-text-default), 0.15);
+      box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+    }
+    &::-webkit-scrollbar-track {
+      /*滚动条里面轨道*/
+      @apply rounded-lg;
+      box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+      background: rgba(255, 255, 255, 0.05);
+    }
+    &::-webkit-scrollbar-thumb:hover {
+      /*滚动条整体样式*/
+      @apply bg-[#64d1e2];
+    }
+  }
   .mio-col-6 {
     -webkit-box-flex: 0;
     -ms-flex: 0 0 16.666667%;

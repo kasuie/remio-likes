@@ -2,7 +2,7 @@
  * @Author: kasuie
  * @Date: 2024-04-28 10:27:12
  * @LastEditors: kasuie
- * @LastEditTime: 2024-04-28 11:52:00
+ * @LastEditTime: 2024-04-28 14:05:19
  * @Description:
  */
 import { NextResponse } from "next/server";
@@ -23,6 +23,8 @@ export const GET = async (req: NextRequest) => {
     return NextResponse.json({});
   }
   const base64Data = imageData.toString("base64");
+  console.log(base64Data.length, "::::", url);
+
   const base64Image = `data:image/${imageFormat};base64,${base64Data}`;
-  return NextResponse.json({ base64Image });
+  return NextResponse.json(base64Image);
 };
