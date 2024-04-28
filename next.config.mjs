@@ -2,7 +2,7 @@
  * @Author: kasuie
  * @Date: 2024-04-26 11:51:38
  * @LastEditors: kasuie
- * @LastEditTime: 2024-04-27 17:24:23
+ * @LastEditTime: 2024-04-28 11:06:40
  * @Description:
  */
 /** @type {import('next').NextConfig} */
@@ -36,7 +36,7 @@ const nextConfig = {
       },
       {
         source: "/bpic/:path*",
-        destination: "http://lain.bgm.tv/:path*",
+        destination: "https://lain.bgm.tv/:path*",
       },
     ];
     return {

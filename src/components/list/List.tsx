@@ -2,7 +2,7 @@
  * @Author: kasuie
  * @Date: 2024-04-26 14:55:29
  * @LastEditors: kasuie
- * @LastEditTime: 2024-04-27 17:15:51
+ * @LastEditTime: 2024-04-28 11:59:26
  * @Description:
  */
 "use client";
@@ -20,6 +20,7 @@ import { Button } from "@nextui-org/button";
 import { Input } from "@nextui-org/input";
 import { clsx } from "@kasuie/utils";
 import request from "@/lib/fetch";
+import { convertAllImagesToBase64, toBase64 } from "@/lib/utils";
 import { Search, Image as ImageIcon } from "../icon";
 import html2canvas from "html2canvas";
 
@@ -49,7 +50,7 @@ export const List = ({ data }: { data: any }) => {
   const [isOpen, setIsopen] = useState(false);
   const [active, setActive]: any = useState();
   const [searchData, setSearchData]: Array<any> = useState();
-  const [temp, setTemp] = useState({ id: null });
+  const [temp, setTemp]: any = useState({ id: null });
   const [keywords, setKeywords] = useState("");
 
   const onClose = () => {
@@ -62,7 +63,6 @@ export const List = ({ data }: { data: any }) => {
   };
 
   const onSearch = (key: string) => {
-    console.log("onsearch>>>");
     if (!keywords) return;
     if (key === "Enter") {
       request
@@ -72,14 +72,17 @@ export const List = ({ data }: { data: any }) => {
           setSearchData(
             list?.map((v: any) => {
               const { images } = v;
-              const keys = Object.keys(images);
-              keys.map((key: string) => {
-                const proxyImg = images[key].replace(
-                  "http://lain.bgm.tv",
-                  "/bpic"
-                );
-                images[key] = proxyImg;
-              });
+              const { large } = images || {};
+              if (images) {
+                const keys = Object.keys(images);
+                keys.map((key: string) => {
+                  const proxyImg = images[key].replace(
+                    "http://lain.bgm.tv",
+                    "/bpic"
+                  );
+                  images[key] = proxyImg;
+                });
+              }
               return {
                 ...v,
                 images: images,
@@ -93,8 +96,9 @@ export const List = ({ data }: { data: any }) => {
   const toImage = () => {
     remioLikesRef.current &&
       html2canvas(remioLikesRef.current, {
-        useCORS: true,
+        proxy: "http://localhost:3000/bpic",
         allowTaint: true,
+        onclone: (cloned) => convertAllImagesToBase64("http://localhost:3000/api/image", cloned),
       }).then((canvas: HTMLCanvasElement) => {
         console.log(canvas, canvas.toDataURL());
       });

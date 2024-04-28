@@ -2,7 +2,7 @@
  * @Author: kasuie
  * @Date: 2024-04-26 15:13:38
  * @LastEditors: kasuie
- * @LastEditTime: 2024-04-27 16:53:43
+ * @LastEditTime: 2024-04-28 11:56:15
  * @Description:
  */
 import { Image } from "@nextui-org/image";
@@ -24,23 +24,26 @@ export const Card = ({
   return (
     <li className="flex flex-col justify-between border-4 border-black rounded-xl bg-white/15 h-64 w-40 relative">
       <div
-        className="flex flex-1"
+        className={`flex flex-1`}
         style={{
           maxHeight: "calc(100% - 36px)",
+          // backgroundImage: `url(${data?.images?.large})`,
         }}
         onClick={() => {
           setActive(data?.index);
           onSelect?.();
         }}
       >
-        <Image
-          className="h-full object-cover cursor-pointer w-full"
-          classNames={{
-            wrapper: "!max-w-none w-full",
-          }}
-          src={data?.images?.large || ""}
-          alt={data?.name || data.label}
-        />
+        {data?.images?.large && (
+          <Image
+            className="h-full object-cover cursor-pointer w-full"
+            classNames={{
+              wrapper: "!max-w-none w-full",
+            }}
+            src={data?.images?.large}
+            alt={data?.name || data.label}
+          />
+        )}
       </div>
       <div className="text-center text-lg py-1">{data.label}</div>
     </li>
