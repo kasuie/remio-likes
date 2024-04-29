@@ -2,11 +2,11 @@
  * @Author: kasuie
  * @Date: 2024-04-26 14:55:29
  * @LastEditors: kasuie
- * @LastEditTime: 2024-04-28 20:55:50
+ * @LastEditTime: 2024-04-29 11:54:07
  * @Description:
  */
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { Key, useEffect, useRef, useState } from "react";
 import { Card } from "../card/Card";
 import {
   Modal,
@@ -16,7 +16,7 @@ import {
   ModalHeader,
 } from "@nextui-org/modal";
 import { Image } from "@nextui-org/image";
-import { Button } from "@nextui-org/button";
+import { Button, ButtonGroup } from "@nextui-org/button";
 import { Input } from "@nextui-org/input";
 import { clsx, storage } from "@kasuie/utils";
 import request from "@/lib/fetch";
@@ -28,10 +28,17 @@ import {
   Share,
   Anima,
   SearchIcon,
+  ChevronDownIcon,
 } from "../icon";
 import html2canvas from "html2canvas";
 import { Loader } from "../loader/Loader";
 import { ListItem } from "@/types/global";
+import {
+  Dropdown,
+  DropdownTrigger,
+  DropdownItem,
+  DropdownMenu,
+} from "@nextui-org/dropdown";
 
 export const List = ({ allList }: { allList: Array<ListItem> }) => {
   const [aData, setAData] = useState([
@@ -61,10 +68,22 @@ export const List = ({ allList }: { allList: Array<ListItem> }) => {
   const [searchData, setSearchData]: Array<any> = useState();
   const [temp, setTemp]: any = useState({ id: null });
   const [keywords, setKeywords] = useState("");
+  const [aList, setAList] = useState<ListItem>();
+  const [selectedKey, setSelectedKey] = useState("");
 
   useEffect(() => {
-    console.log(allList);
+    const activeType = storage.l.get("mio-likes-active") || "";
+    if (activeType) {
+    } else {
+      setSelectedKey(allList[0].type);
+    }
   }, [allList]);
+
+  useEffect(() => {
+    if (selectedKey) {
+      setAList(allList.find((v: ListItem) => v.type === selectedKey));
+    }
+  }, [selectedKey]);
 
   const onClose = () => {
     setIsopen(false);
@@ -84,13 +103,14 @@ export const List = ({ allList }: { allList: Array<ListItem> }) => {
         .get(`/bapi/search/subject/${keywords}`, {
           type: 2,
           responseGroup: "small",
+          max_results: 25,
         })
         .then((res: any) => {
           const { results, list } = res;
           setSearchData(
             list?.map((v: any) => {
               const { images } = v;
-              const { large } = images || {};
+              const covers = Object.assign({}, images);
               if (images) {
                 const keys = Object.keys(images);
                 keys.map((key: string) => {
@@ -103,7 +123,7 @@ export const List = ({ allList }: { allList: Array<ListItem> }) => {
               }
               return {
                 ...v,
-                cover: large,
+                covers,
                 images: images,
               };
             }) || []
@@ -121,7 +141,7 @@ export const List = ({ allList }: { allList: Array<ListItem> }) => {
         backgroundColor: storage.l.get("theme") === "dark" ? "#000" : "#fff",
         width: remioLikesRef.current.offsetWidth + 4,
         height: remioLikesRef.current.offsetHeight + 4,
-        onclone: (cloned) => convertAllImagesToBase64("/api/image", cloned),
+        // onclone: (cloned) => convertAllImagesToBase64("/api/image", cloned),
       }).then((canvas: HTMLCanvasElement) => {
         setResult(canvas.toDataURL());
         setIsResult(true);
@@ -131,19 +151,50 @@ export const List = ({ allList }: { allList: Array<ListItem> }) => {
 
   return (
     <div ref={remioLikesRef} className="p-4 mx-auto w-full md:w-3/5 h-full">
+      <div className="text-end">
+        <ButtonGroup variant="flat">
+          <Button size="sm">切换</Button>
+          <Dropdown placement="bottom-end">
+            <DropdownTrigger>
+              <Button size="sm" isIconOnly>
+                <ChevronDownIcon />
+              </Button>
+            </DropdownTrigger>
+            <DropdownMenu
+              disallowEmptySelection
+              aria-label="Merge options"
+              selectedKeys={selectedKey}
+              selectionMode="single"
+              onSelectionChange={(keys: any) => {
+                setSelectedKey(keys.currentKey);
+              }}
+              className="max-w-[300px]"
+            >
+              {allList?.length ? (
+                allList.map((v: ListItem) => {
+                  return <DropdownItem key={v.type}>{v.title}</DropdownItem>;
+                })
+              ) : (
+                <div></div>
+              )}
+            </DropdownMenu>
+          </Dropdown>
+        </ButtonGroup>
+      </div>
       <div>
-        <h1 className="text-5xl font-extrabold pt-4 pb-12 text-center">
-          游戏生涯个人喜好表
+        <h1 className="text-3xl md:text-5xl font-extrabold pt-4 pb-12 text-center">
+          {aList?.title || "生涯个人喜好表"}
         </h1>
         <ul className="grid grid-cols-2 md:grid-cols-5 gap-4 w-full">
-          {aData?.length &&
-            aData.map((v: any, index: number) => {
+          {aList?.data?.length &&
+            aList.data.map((v: any, index: number) => {
               return (
                 <Card
                   onSelect={onSelect}
                   setActive={setActive}
                   data={{ ...v, index }}
-                  key={index}
+                  type={selectedKey}
+                  key={`${index}:${selectedKey}`}
                 />
               );
             })}
@@ -165,6 +216,11 @@ export const List = ({ allList }: { allList: Array<ListItem> }) => {
         key={active}
         isOpen={isOpen}
         onClose={onClose}
+        className="!mx-0 !my-2 max-h-screen"
+        classNames={{
+          footer: "md:py-4 py-2",
+          closeButton: "z-[11]",
+        }}
       >
         <ModalContent>
           {isResult
@@ -228,7 +284,7 @@ export const List = ({ allList }: { allList: Array<ListItem> }) => {
                         onValueChange={setKeywords}
                       />
                     </div>
-                    <div className="w-full flex flex-wrap">
+                    <div className="w-full mio-scroll flex flex-wrap max-h-[500px] overflow-y-auto">
                       {searchData ? (
                         searchData.map((v: any, index: number) => {
                           return (
@@ -240,15 +296,15 @@ export const List = ({ allList }: { allList: Array<ListItem> }) => {
                               className={clsx(
                                 "mio-col-2 cursor-pointer border duration-300 rounded border-transparent sm:mio-col-2 md:mio-col-2 lg:mio-col-3 xl:mio-col-5 2xl:mio-col-5 p-1",
                                 {
-                                  "border-pink-400": v?.id == temp?.id,
+                                  "!border-pink-400": v?.id == temp?.id,
                                 }
                               )}
                             >
-                              <div className="flex flex-1 mb-1">
+                              <div className="flex flex-1 mb-1 item-center justify-center">
                                 <Image
                                   className="h-full object-cover cursor-pointer"
                                   radius="sm"
-                                  src={v?.images?.common || ""}
+                                  src={v?.covers?.common || ""}
                                   alt={v?.name_cn || "name"}
                                 />
                               </div>
@@ -277,10 +333,10 @@ export const List = ({ allList }: { allList: Array<ListItem> }) => {
                     <Button
                       color="primary"
                       onPress={() => {
-                        if (active > -1) {
+                        if (active > -1 && aList) {
                           result && setResult("");
-                          aData[active] = {
-                            ...aData[active],
+                          aList.data[active] = {
+                            ...aList.data[active],
                             ...temp,
                           };
                         }

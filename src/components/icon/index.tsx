@@ -2,7 +2,7 @@
  * @Author: kasuie
  * @Date: 2024-04-26 17:13:03
  * @LastEditors: kasuie
- * @LastEditTime: 2024-04-28 20:04:07
+ * @LastEditTime: 2024-04-29 10:47:41
  * @Description:
  */
 import { SVGProps } from "react";
@@ -259,6 +259,21 @@ export const Github = (props: Svg) => {
         fillRule="evenodd"
         clipRule="evenodd"
       ></path>
+    </svg>
+  );
+};
+
+export const ChevronDownIcon = (props: Svg) => {
+  return (
+    <svg
+      viewBox="0 0 15 15"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      width={props.size || 16}
+      height={props.size || 16}
+      {...props}
+    >
+      <path d="M4 6H11L7.5 10.5L4 6Z" fill="currentColor"></path>
     </svg>
   );
 };

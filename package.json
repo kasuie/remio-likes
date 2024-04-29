@@ -13,6 +13,7 @@
   "dependencies": {
     "@kasuie/utils": "^0.0.4",
     "@nextui-org/button": "^2.0.31",
+    "@nextui-org/dropdown": "^2.1.23",
     "@nextui-org/image": "^2.0.27",
     "@nextui-org/input": "^2.1.21",
     "@nextui-org/link": "^2.0.29",

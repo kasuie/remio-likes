@@ -2,7 +2,7 @@
  * @Author: kasuie
  * @Date: 2024-04-28 20:41:54
  * @LastEditors: kasuie
- * @LastEditTime: 2024-04-28 20:55:24
+ * @LastEditTime: 2024-04-29 11:45:54
  * @Description:
  */
 import { ListItem } from "@/types/global";
@@ -35,7 +35,7 @@ export const allList: Array<ListItem> = [
     data: [
       { label: "入坑作" },
       { label: "最喜欢" },
-      { label: "看最多次" },
+      { label: "玩最多次" },
       { label: "最想安利" },
       { label: "最佳剧情" },
       { label: "最佳画面" },
