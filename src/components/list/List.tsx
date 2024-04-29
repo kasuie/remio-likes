@@ -2,7 +2,7 @@
  * @Author: kasuie
  * @Date: 2024-04-26 14:55:29
  * @LastEditors: kasuie
- * @LastEditTime: 2024-04-29 15:32:45
+ * @LastEditTime: 2024-04-29 21:32:59
  * @Description:
  */
 "use client";
@@ -42,24 +42,6 @@ import {
 import { ThemeSwitcher } from "../theme-switcher/ThemeSwitcher";
 
 export const List = ({ allList }: { allList: Array<ListItem> }) => {
-  const [aData, setAData] = useState([
-    { label: "入坑作" },
-    { label: "最喜欢" },
-    { label: "看最多次" },
-    { label: "最想安利" },
-    { label: "最佳剧情" },
-    { label: "最佳画面" },
-    { label: "最佳配乐" },
-    { label: "最佳配音" },
-    { label: "最治愈" },
-    { label: "最致郁" },
-    { label: "最被低估" },
-    { label: "最搞笑" },
-    { label: "最胃疼" },
-    { label: "最热血" },
-    { label: "最甜" },
-  ]);
-
   const remioLikesRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsopen] = useState(false);
   const [isResult, setIsResult] = useState(false);
@@ -75,6 +57,8 @@ export const List = ({ allList }: { allList: Array<ListItem> }) => {
   useEffect(() => {
     const activeType = storage.l.get("mio-likes-active") || "";
     if (activeType) {
+      setSelectedKey(activeType);
+      setAList(allList.find((v: ListItem) => v.type == activeType));
     } else {
       setSelectedKey(allList[0].type);
     }
@@ -89,6 +73,8 @@ export const List = ({ allList }: { allList: Array<ListItem> }) => {
   const onClose = () => {
     setIsopen(false);
   };
+
+  const mergeList = () => {};
 
   const onSelect = () => {
     if (isResult) setIsResult(false);
@@ -164,6 +150,7 @@ export const List = ({ allList }: { allList: Array<ListItem> }) => {
         height: remioLikesRef.current.offsetHeight + 4,
         onclone: (cloned) => convertAllImagesToBase64("/api/image", cloned),
       }).then((canvas: HTMLCanvasElement) => {
+        console.log(aList, "alist");
         setResult(canvas.toDataURL());
         setIsResult(true);
         setIsopen(true);
@@ -191,6 +178,7 @@ export const List = ({ allList }: { allList: Array<ListItem> }) => {
               selectedKeys={selectedKey}
               selectionMode="single"
               onSelectionChange={(keys: any) => {
+                storage.l.set("mio-likes-active", keys.currentKey);
                 setSelectedKey(keys.currentKey);
               }}
               className="max-w-[300px]"
@@ -266,12 +254,14 @@ export const List = ({ allList }: { allList: Array<ListItem> }) => {
                     <Image src={result} alt="result" />
                   </ModalBody>
                   <ModalFooter>
-                    <Button color="success" isIconOnly onPress={onClose}>
+                    <p className="md:hidden">长按图片即可保存或分享~</p>
+                    {/* <Button color="success" isIconOnly onPress={onClose}>
                       <Share />
-                    </Button>
+                    </Button> */}
                     <Button
                       color="success"
                       isIconOnly
+                      className=" hidden md:flex"
                       onPress={() => {
                         download(result, "个人喜好表");
                       }}
@@ -284,7 +274,7 @@ export const List = ({ allList }: { allList: Array<ListItem> }) => {
             : (onClose) => (
                 <>
                   <ModalHeader className="flex flex-col gap-1">
-                    {aData[active].label || "请选择"}
+                    {(aList?.data && aList.data[active].label) || "请选择"}
                   </ModalHeader>
                   <ModalBody>
                     <div>
