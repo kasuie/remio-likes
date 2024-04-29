@@ -2,7 +2,7 @@
  * @Author: kasuie
  * @Date: 2024-04-26 14:55:29
  * @LastEditors: kasuie
- * @LastEditTime: 2024-04-29 11:54:07
+ * @LastEditTime: 2024-04-29 15:32:45
  * @Description:
  */
 "use client";
@@ -39,6 +39,7 @@ import {
   DropdownItem,
   DropdownMenu,
 } from "@nextui-org/dropdown";
+import { ThemeSwitcher } from "../theme-switcher/ThemeSwitcher";
 
 export const List = ({ allList }: { allList: Array<ListItem> }) => {
   const [aData, setAData] = useState([
@@ -99,12 +100,25 @@ export const List = ({ allList }: { allList: Array<ListItem> }) => {
     if (!keywords) return;
     if (key === "Enter") {
       setIsLoading(true);
-      request
-        .get(`/bapi/search/subject/${keywords}`, {
+      let url = "",
+        params = {};
+      if (selectedKey == "anima") {
+        url = `/bapi/search/subject/${keywords}`;
+        params = {
           type: 2,
           responseGroup: "small",
           max_results: 25,
-        })
+        };
+      } else if (selectedKey == "game") {
+        url = `/bapi/search/subject/${keywords}`;
+        params = {
+          type: 4,
+          responseGroup: "small",
+          max_results: 25,
+        };
+      }
+      request
+        .get(url, params)
         .then((res: any) => {
           const { results, list } = res;
           setSearchData(
@@ -114,11 +128,16 @@ export const List = ({ allList }: { allList: Array<ListItem> }) => {
               if (images) {
                 const keys = Object.keys(images);
                 keys.map((key: string) => {
-                  const proxyImg = images[key].replace(
-                    "http://lain.bgm.tv",
-                    "/bpic"
-                  );
-                  images[key] = proxyImg;
+                  if (images[key]) {
+                    if (covers[key].includes("http://")) {
+                      covers[key] = covers[key].replace("http://", "https://");
+                    }
+                    const proxyImg = images[key].replace(
+                      "http://lain.bgm.tv",
+                      "/bpic"
+                    );
+                    images[key] = proxyImg;
+                  }
                 });
               }
               return {
@@ -129,31 +148,37 @@ export const List = ({ allList }: { allList: Array<ListItem> }) => {
             }) || []
           );
         })
+        .catch(() => setIsLoading(false))
         .finally(() => setIsLoading(false));
     }
   };
 
   const toImage = () => {
-    if (result && temp) setIsopen(true);
+    if (result && temp.id) return setIsopen(true);
+    setIsLoading(true);
     remioLikesRef.current &&
       html2canvas(remioLikesRef.current, {
         allowTaint: true,
         backgroundColor: storage.l.get("theme") === "dark" ? "#000" : "#fff",
         width: remioLikesRef.current.offsetWidth + 4,
         height: remioLikesRef.current.offsetHeight + 4,
-        // onclone: (cloned) => convertAllImagesToBase64("/api/image", cloned),
+        onclone: (cloned) => convertAllImagesToBase64("/api/image", cloned),
       }).then((canvas: HTMLCanvasElement) => {
         setResult(canvas.toDataURL());
         setIsResult(true);
         setIsopen(true);
+        setIsLoading(false);
       });
   };
 
   return (
     <div ref={remioLikesRef} className="p-4 mx-auto w-full md:w-3/5 h-full">
-      <div className="text-end">
+      <div
+        className="text-end flex items-center justify-end gap-3"
+        data-html2canvas-ignore
+      >
         <ButtonGroup variant="flat">
-          <Button size="sm">切换</Button>
+          <Button size="sm">切换表</Button>
           <Dropdown placement="bottom-end">
             <DropdownTrigger>
               <Button size="sm" isIconOnly>
@@ -180,10 +205,11 @@ export const List = ({ allList }: { allList: Array<ListItem> }) => {
             </DropdownMenu>
           </Dropdown>
         </ButtonGroup>
+        <ThemeSwitcher />
       </div>
       <div>
         <h1 className="text-3xl md:text-5xl font-extrabold pt-4 pb-12 text-center">
-          {aList?.title || "生涯个人喜好表"}
+          {aList?.title || "喜好生成表"}
         </h1>
         <ul className="grid grid-cols-2 md:grid-cols-5 gap-4 w-full">
           {aList?.data?.length &&
@@ -200,12 +226,22 @@ export const List = ({ allList }: { allList: Array<ListItem> }) => {
             })}
         </ul>
       </div>
-      <div className="pt-6 text-center" data-html2canvas-ignore>
+      <div className="pt-6 text-center relative">
+        <div className="mio-copyright hidden absolute min-h-10 md:bottom-0 bottom-[-24px] flex-nowrap gap-1 items-end opacity-65 text-xs">
+          <span>like.kasuie.cc</span>・
+          <div className="flex items-center gap-[2px]">
+            <span>数据源</span>
+            <span>Bangumi</span>
+          </div>
+          ・<span>禁止商业，盈利用途</span>
+        </div>
         <Button
           color="success"
-          className=" min-w-32"
-          startContent={<ImageIcon />}
+          className="min-w-32"
+          endContent={<ImageIcon />}
           onClick={() => toImage()}
+          isLoading={isLoading}
+          data-html2canvas-ignore
         >
           生成图片
         </Button>

@@ -2,11 +2,19 @@
  * @Author: kasuie
  * @Date: 2024-04-26 11:51:38
  * @LastEditors: kasuie
- * @LastEditTime: 2024-04-28 11:06:40
+ * @LastEditTime: 2024-04-29 14:57:04
  * @Description:
  */
 /** @type {import('next').NextConfig} */
+import nextPWA from 'next-pwa';
 const isProd = process.env.NODE_ENV === "production";
+
+const withPWA = nextPWA({
+  dest: 'public',
+  register: true,
+  skipWaiting: true,
+  disable: !isProd,
+});
 
 const nextConfig = {
   output: "standalone",
@@ -45,4 +53,4 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+export default withPWA(nextConfig);

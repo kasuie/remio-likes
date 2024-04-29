@@ -2,7 +2,7 @@
  * @Author: kasuie
  * @Date: 2024-04-26 11:51:38
  * @LastEditors: kasuie
- * @LastEditTime: 2024-04-29 10:58:43
+ * @LastEditTime: 2024-04-29 15:22:31
  * @Description:
  */
 import type { Config } from "tailwindcss";
@@ -22,7 +22,7 @@ const config: Config = {
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
-    "./node_modules/@nextui-org/theme/dist/components/(avatar|dropdown|date-picker|spinner|calendar|checkbox|breadcrumbs|link|button|tabs|skeleton|tooltip|modal|select|radio|input|slider|chip).js",
+    "./node_modules/@nextui-org/theme/dist/components/(avatar|dropdown|spinner|link|button|skeleton|modal|select|input|chip).js",
   ],
   theme: {
     extend: {

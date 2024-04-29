@@ -2,7 +2,7 @@
  * @Author: kasuie
  * @Date: 2024-04-28 20:41:54
  * @LastEditors: kasuie
- * @LastEditTime: 2024-04-29 11:45:54
+ * @LastEditTime: 2024-04-29 15:42:01
  * @Description:
  */
 import { ListItem } from "@/types/global";
@@ -44,7 +44,7 @@ export const allList: Array<ListItem> = [
       { label: "最治愈" },
       { label: "最致郁" },
       { label: "最被低估" },
-      { label: "最搞笑" },
+      { label: "最爽快" },
       { label: "最胃疼" },
       { label: "最热血" },
       { label: "最甜" },

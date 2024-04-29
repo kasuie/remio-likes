@@ -2,7 +2,7 @@
  * @Author: kasuie
  * @Date: 2024-04-28 09:26:19
  * @LastEditors: kasuie
- * @LastEditTime: 2024-04-28 16:50:32
+ * @LastEditTime: 2024-04-29 15:13:10
  * @Description:
  */
 import https from "https";
@@ -42,6 +42,9 @@ export const convertAllImagesToBase64 = async (
   proxyURL: string,
   cloned: any
 ) => {
+  const copyright = cloned.querySelector(".mio-copyright");
+  copyright.style.display = "flex";
+
   const pendingImagesPromises = [];
   const pendingPromisesData: any = [];
 
