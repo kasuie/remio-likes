@@ -35,6 +35,9 @@ dependencies:
   '@nextui-org/theme':
     specifier: ^2.2.3
     version: 2.2.3(tailwindcss@3.4.3)
+  dom-to-image:
+    specifier: ^2.6.0
+    version: 2.6.0
   framer-motion:
     specifier: ^11.1.7
     version: 11.1.7(react-dom@18.3.0)(react@18.3.0)
@@ -67,6 +70,9 @@ devDependencies:
   '@kasuie/prettier':
     specifier: ^0.1.2
     version: 0.1.2
+  '@types/dom-to-image':
+    specifier: ^2.6.7
+    version: 2.6.7
   '@types/node':
     specifier: ^20
     version: 20.12.7
@@ -2746,6 +2752,10 @@ packages:
       '@types/node': 20.12.7
     dev: true
 
+  /@types/dom-to-image@2.6.7:
+    resolution: {integrity: sha512-me5VbCv+fcXozblWwG13krNBvuEOm6kA5xoa4RrjDJCNFOZSWR3/QLtOXimBHk1Fisq69Gx3JtOoXtg1N1tijg==}
+    dev: true
+
   /@types/eslint-scope@3.7.7:
     resolution: {integrity: sha512-MzMFlSLBqNF2gcHWO0G1vP/YQyfvrxZ0bF+u7mzUdZ1/xK4A4sru+nraZz5i3iEIk1l1uyicaDVTB4QbbEkAYg==}
     dependencies:
@@ -3843,6 +3853,10 @@ packages:
     dependencies:
       esutils: 2.0.3
     dev: true
+
+  /dom-to-image@2.6.0:
+    resolution: {integrity: sha512-Dt0QdaHmLpjURjU7Tnu3AgYSF2LuOmksSGsUcE6ItvJoCWTBEmiMXcqBdNSAm9+QbbwD7JMoVsuuKX6ZVQv1qA==}
+    dev: false
 
   /dot-prop@5.3.0:
     resolution: {integrity: sha512-QM8q3zDe58hqUqjraQOmzZ1LIH9SWQJTlEKCH4kJ2oQvLZk7RbQXvtDM2XEq3fwkV9CCvvH4LA0AV+ogFsBM2Q==}

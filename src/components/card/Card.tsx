@@ -2,11 +2,11 @@
  * @Author: kasuie
  * @Date: 2024-04-26 15:13:38
  * @LastEditors: kasuie
- * @LastEditTime: 2024-04-29 11:53:25
+ * @LastEditTime: 2024-05-06 10:51:59
  * @Description:
  */
 import { Image } from "@nextui-org/image";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Anima, Game } from "../icon";
 export const Card = ({
   data,
@@ -15,28 +15,40 @@ export const Card = ({
   setActive,
 }: {
   data?: any;
-  type: string,
+  type: string;
   onSelect: Function;
   setActive: Function;
 }) => {
+  const imageRef = useRef<HTMLImageElement>(null);
 
   const renderIcon = () => {
     switch (type) {
       case "anima":
-        return <Anima />
+        return <Anima />;
       case "game":
-        return <Game />
+        return <Game />;
       default:
         break;
     }
-  }
+  };
+
+  const getBase64Image = (img: any) => {
+    const canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
+    const ctx: any = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0, img.width, img.height);
+    const ext = img.src.substring(img.src.lastIndexOf(".") + 1).toLowerCase();
+    const dataURL = canvas.toDataURL("image/" + ext);
+    return dataURL;
+  };
 
   return (
-    <li className="flex overflow-hidden flex-col gap-1 justify-between border-4 border-mio-content/60 rounded-xl bg-mio-main/15 h-72 relative">
+    <li className="flex overflow-hidden flex-col justify-between border-4 border-mio-content/60 rounded-xl bg-mio-main/15 h-72 relative">
       <div
         className={`flex justify-center group items-center cursor-pointer flex-1 overflow-hidden`}
         style={{
-          maxHeight: "calc(100% - 36px)",
+          maxHeight: "calc(100% - 28px)",
           // backgroundImage: `url(${data?.images?.large})`,
         }}
         onClick={() => {
@@ -46,12 +58,14 @@ export const Card = ({
       >
         {data?.covers?.large ? (
           <Image
+            ref={imageRef}
             className="h-full object-cover w-full"
             classNames={{
-              wrapper: "!max-w-none w-full",
+              wrapper: "!max-w-none w-full h-full",
             }}
             radius="none"
-            src={data?.covers?.large}
+            crossOrigin="anonymous"
+            src={data?.images?.large}
             alt={data?.name || data.label}
           />
         ) : (
@@ -60,7 +74,7 @@ export const Card = ({
           </div>
         )}
       </div>
-      <div className="text-center text-lg mb-2">{data.label}</div>
+      <div className="text-center text-lg">{data.label}</div>
     </li>
   );
 };

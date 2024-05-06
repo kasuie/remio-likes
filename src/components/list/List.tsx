@@ -2,11 +2,11 @@
  * @Author: kasuie
  * @Date: 2024-04-26 14:55:29
  * @LastEditors: kasuie
- * @LastEditTime: 2024-04-29 21:32:59
+ * @LastEditTime: 2024-05-06 11:59:06
  * @Description:
  */
 "use client";
-import { Key, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Card } from "../card/Card";
 import {
   Modal,
@@ -20,7 +20,7 @@ import { Button, ButtonGroup } from "@nextui-org/button";
 import { Input } from "@nextui-org/input";
 import { clsx, storage } from "@kasuie/utils";
 import request from "@/lib/fetch";
-import { convertAllImagesToBase64, download } from "@/lib/utils";
+import { download } from "@/lib/utils";
 import {
   Search,
   Image as ImageIcon,
@@ -30,7 +30,6 @@ import {
   SearchIcon,
   ChevronDownIcon,
 } from "../icon";
-import html2canvas from "html2canvas";
 import { Loader } from "../loader/Loader";
 import { ListItem } from "@/types/global";
 import {
@@ -40,6 +39,7 @@ import {
   DropdownMenu,
 } from "@nextui-org/dropdown";
 import { ThemeSwitcher } from "../theme-switcher/ThemeSwitcher";
+import domtoimage from "dom-to-image";
 
 export const List = ({ allList }: { allList: Array<ListItem> }) => {
   const remioLikesRef = useRef<HTMLDivElement>(null);
@@ -140,26 +140,30 @@ export const List = ({ allList }: { allList: Array<ListItem> }) => {
   };
 
   const toImage = () => {
-    if (result && temp.id) return setIsopen(true);
-    setIsLoading(true);
-    remioLikesRef.current &&
-      html2canvas(remioLikesRef.current, {
-        allowTaint: true,
-        backgroundColor: storage.l.get("theme") === "dark" ? "#000" : "#fff",
-        width: remioLikesRef.current.offsetWidth + 4,
-        height: remioLikesRef.current.offsetHeight + 4,
-        onclone: (cloned) => convertAllImagesToBase64("/api/image", cloned),
-      }).then((canvas: HTMLCanvasElement) => {
-        console.log(aList, "alist");
-        setResult(canvas.toDataURL());
-        setIsResult(true);
-        setIsopen(true);
-        setIsLoading(false);
-      });
+    if (remioLikesRef && remioLikesRef.current) {
+      if (result && temp.id) return setIsopen(true);
+      setIsLoading(true);
+      domtoimage
+        .toPng(remioLikesRef.current, {
+          width: remioLikesRef.current.offsetWidth,
+          height: remioLikesRef.current.offsetHeight,
+        })
+        .then(function (dataUrl) {
+          console.log(aList, "alist");
+          setResult(dataUrl);
+          setIsResult(true);
+          setIsopen(true);
+          setIsLoading(false);
+        })
+        .catch(function (error) {
+          console.error("oops, something went wrong!", error);
+          setIsLoading(false);
+        });
+    }
   };
 
   return (
-    <div ref={remioLikesRef} className="p-4 mx-auto w-full md:w-3/5 h-full">
+    <div className="py-4 mx-auto w-full md:w-3/5 h-full">
       <div
         className="text-end flex items-center justify-end gap-3"
         data-html2canvas-ignore
@@ -195,7 +199,7 @@ export const List = ({ allList }: { allList: Array<ListItem> }) => {
         </ButtonGroup>
         <ThemeSwitcher />
       </div>
-      <div>
+      <div ref={remioLikesRef} className="p-4 bg-mio-main">
         <h1 className="text-3xl md:text-5xl font-extrabold pt-4 pb-12 text-center">
           {aList?.title || "喜好生成表"}
         </h1>
@@ -213,9 +217,7 @@ export const List = ({ allList }: { allList: Array<ListItem> }) => {
               );
             })}
         </ul>
-      </div>
-      <div className="pt-6 text-center relative">
-        <div className="mio-copyright hidden absolute min-h-10 md:bottom-0 bottom-[-24px] flex-nowrap gap-1 items-end opacity-65 text-xs">
+        <div className="mio-copyright flex min-h-10 md:bottom-0 bottom-[-24px] flex-nowrap gap-1 items-end opacity-65 text-xs">
           <span>like.kasuie.cc</span>・
           <div className="flex items-center gap-[2px]">
             <span>数据源</span>
@@ -223,6 +225,8 @@ export const List = ({ allList }: { allList: Array<ListItem> }) => {
           </div>
           ・<span>禁止商业，盈利用途</span>
         </div>
+      </div>
+      <div className="pt-2 text-center relative">
         <Button
           color="success"
           className="min-w-32"
@@ -328,7 +332,7 @@ export const List = ({ allList }: { allList: Array<ListItem> }) => {
                             >
                               <div className="flex flex-1 mb-1 item-center justify-center">
                                 <Image
-                                  className="h-full object-cover cursor-pointer"
+                                  className="h-full min-h-28 object-cover cursor-pointer"
                                   radius="sm"
                                   src={v?.covers?.common || ""}
                                   alt={v?.name_cn || "name"}
