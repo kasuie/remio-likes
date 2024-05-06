@@ -2,7 +2,7 @@
  * @Author: kasuie
  * @Date: 2024-04-26 14:55:29
  * @LastEditors: kasuie
- * @LastEditTime: 2024-05-06 11:59:06
+ * @LastEditTime: 2024-05-06 14:15:31
  * @Description:
  */
 "use client";
@@ -200,7 +200,7 @@ export const List = ({ allList }: { allList: Array<ListItem> }) => {
         <ThemeSwitcher />
       </div>
       <div ref={remioLikesRef} className="p-4 bg-mio-main">
-        <h1 className="text-3xl md:text-5xl font-extrabold pt-4 pb-12 text-center">
+        <h1 className="text-3xl md:text-5xl font-extrabold pt-4 pb-8 text-center">
           {aList?.title || "喜好生成表"}
         </h1>
         <ul className="grid grid-cols-2 md:grid-cols-5 gap-4 w-full">
@@ -254,7 +254,7 @@ export const List = ({ allList }: { allList: Array<ListItem> }) => {
           {isResult
             ? (onClose) => (
                 <>
-                  <ModalBody className="py-0">
+                  <ModalBody className="py-0 mt-8">
                     <Image src={result} alt="result" />
                   </ModalBody>
                   <ModalFooter>
@@ -334,7 +334,7 @@ export const List = ({ allList }: { allList: Array<ListItem> }) => {
                                 <Image
                                   className="h-full min-h-28 object-cover cursor-pointer"
                                   radius="sm"
-                                  src={v?.covers?.common || ""}
+                                  src={v?.covers?.large || ""}
                                   alt={v?.name_cn || "name"}
                                 />
                               </div>
