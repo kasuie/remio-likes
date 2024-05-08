@@ -8,7 +8,7 @@ WORKDIR /web-likes
 
 COPY . .
 RUN set -eux; \
-    npm install -g pnpm && pnpm i --frozen-lockfile;
+    npm install -g pnpm && pnpm i --no-frozen-lockfile;
 
 FROM base AS builder
 
