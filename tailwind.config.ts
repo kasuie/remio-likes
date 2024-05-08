@@ -2,7 +2,7 @@
  * @Author: kasuie
  * @Date: 2024-04-26 11:51:38
  * @LastEditors: kasuie
- * @LastEditTime: 2024-05-08 17:42:31
+ * @LastEditTime: 2024-05-08 17:49:35
  * @Description:
  */
 import type { Config } from "tailwindcss";
@@ -32,13 +32,13 @@ const config: Config = {
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
       colors: {
-        "mio-main": "rgb(var(--mio-main))",
-        "mio-bg": "rgb(var(--mio-bg))",
+        "mio-main": "rgba(var(--mio-main))",
+        "mio-bg": "rgba(var(--mio-bg))",
         "mio-content": "rgba(var(--mio-text-default))",
       },
       textColor: {
         "mio-text-color": "rgba(var(--mio-text-color))",
-        "mio-text-default": "rgb(var(--mio-text-default))",
+        "mio-text-default": "rgba(var(--mio-text-default))",
       },
     },
   },
