@@ -2,7 +2,7 @@
  * @Author: kasuie
  * @Date: 2024-04-26 14:18:55
  * @LastEditors: kasuie
- * @LastEditTime: 2024-04-28 19:32:49
+ * @LastEditTime: 2024-05-08 15:58:59
  * @Description:
  */
 import { Link } from "@nextui-org/link";
@@ -23,7 +23,7 @@ export const Footer = () => {
         </Link>
         <span>|</span>
         <Link
-          href="https://github.com/kasuie"
+          href="https://github.com/kasuie/remio-likes"
           underline="hover"
           color="foreground"
           size="sm"

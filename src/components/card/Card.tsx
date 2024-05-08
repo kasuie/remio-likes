@@ -2,7 +2,7 @@
  * @Author: kasuie
  * @Date: 2024-04-26 15:13:38
  * @LastEditors: kasuie
- * @LastEditTime: 2024-05-06 10:51:59
+ * @LastEditTime: 2024-05-08 15:44:25
  * @Description:
  */
 import { Image } from "@nextui-org/image";
@@ -32,23 +32,12 @@ export const Card = ({
     }
   };
 
-  const getBase64Image = (img: any) => {
-    const canvas = document.createElement("canvas");
-    canvas.width = img.width;
-    canvas.height = img.height;
-    const ctx: any = canvas.getContext("2d");
-    ctx.drawImage(img, 0, 0, img.width, img.height);
-    const ext = img.src.substring(img.src.lastIndexOf(".") + 1).toLowerCase();
-    const dataURL = canvas.toDataURL("image/" + ext);
-    return dataURL;
-  };
-
   return (
-    <li className="flex overflow-hidden flex-col justify-between border-4 border-mio-content/60 rounded-xl bg-mio-main/15 h-72 relative">
+    <li className="flex overflow-hidden flex-col justify-between border-2 border-mio-content/60 rounded-xl bg-mio-main/15 h-72 relative">
       <div
         className={`flex justify-center group items-center cursor-pointer flex-1 overflow-hidden`}
         style={{
-          maxHeight: "calc(100% - 28px)",
+          maxHeight: "calc(100% - 36px)",
           // backgroundImage: `url(${data?.images?.large})`,
         }}
         onClick={() => {
@@ -74,7 +63,7 @@ export const Card = ({
           </div>
         )}
       </div>
-      <div className="text-center text-lg">{data.label}</div>
+      <div className="text-center py-1 text-lg">{data.label}</div>
     </li>
   );
 };

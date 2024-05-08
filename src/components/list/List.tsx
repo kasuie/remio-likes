@@ -2,7 +2,7 @@
  * @Author: kasuie
  * @Date: 2024-04-26 14:55:29
  * @LastEditors: kasuie
- * @LastEditTime: 2024-05-06 14:15:31
+ * @LastEditTime: 2024-05-08 17:22:18
  * @Description:
  */
 "use client";
@@ -17,20 +17,10 @@ import {
 } from "@nextui-org/modal";
 import { Image } from "@nextui-org/image";
 import { Button, ButtonGroup } from "@nextui-org/button";
-import { Input } from "@nextui-org/input";
 import { clsx, storage } from "@kasuie/utils";
 import request from "@/lib/fetch";
 import { download } from "@/lib/utils";
-import {
-  Search,
-  Image as ImageIcon,
-  Download,
-  Share,
-  Anima,
-  SearchIcon,
-  ChevronDownIcon,
-} from "../icon";
-import { Loader } from "../loader/Loader";
+import { Image as ImageIcon, Download, ChevronDownIcon } from "../icon";
 import { ListItem } from "@/types/global";
 import {
   Dropdown,
@@ -39,6 +29,7 @@ import {
   DropdownMenu,
 } from "@nextui-org/dropdown";
 import { ThemeSwitcher } from "../theme-switcher/ThemeSwitcher";
+import { Search } from "./Search";
 import domtoimage from "dom-to-image";
 
 export const List = ({ allList }: { allList: Array<ListItem> }) => {
@@ -50,9 +41,9 @@ export const List = ({ allList }: { allList: Array<ListItem> }) => {
   const [active, setActive]: any = useState();
   const [searchData, setSearchData]: Array<any> = useState();
   const [temp, setTemp]: any = useState({ id: null });
-  const [keywords, setKeywords] = useState("");
   const [aList, setAList] = useState<ListItem>();
   const [selectedKey, setSelectedKey] = useState("");
+  const [keywords, setKeywords] = useState("");
 
   useEffect(() => {
     const activeType = storage.l.get("mio-likes-active") || "";
@@ -82,7 +73,8 @@ export const List = ({ allList }: { allList: Array<ListItem> }) => {
     setTemp({ id: null });
   };
 
-  const onSearch = (key: string) => {
+  const onSearch = (key: string, keywords: string = "") => {
+    setKeywords(keywords);
     if (!keywords) return;
     if (key === "Enter") {
       setIsLoading(true);
@@ -147,6 +139,9 @@ export const List = ({ allList }: { allList: Array<ListItem> }) => {
         .toPng(remioLikesRef.current, {
           width: remioLikesRef.current.offsetWidth,
           height: remioLikesRef.current.offsetHeight,
+          filter(node: any) {
+            return !node.classList?.contains("mio-image-hidden");
+          },
         })
         .then(function (dataUrl) {
           console.log(aList, "alist");
@@ -163,61 +158,64 @@ export const List = ({ allList }: { allList: Array<ListItem> }) => {
   };
 
   return (
-    <div className="py-4 mx-auto w-full md:w-3/5 h-full">
-      <div
-        className="text-end flex items-center justify-end gap-3"
-        data-html2canvas-ignore
-      >
-        <ButtonGroup variant="flat">
-          <Button size="sm">切换表</Button>
-          <Dropdown placement="bottom-end">
-            <DropdownTrigger>
-              <Button size="sm" isIconOnly>
-                <ChevronDownIcon />
-              </Button>
-            </DropdownTrigger>
-            <DropdownMenu
-              disallowEmptySelection
-              aria-label="Merge options"
-              selectedKeys={selectedKey}
-              selectionMode="single"
-              onSelectionChange={(keys: any) => {
-                storage.l.set("mio-likes-active", keys.currentKey);
-                setSelectedKey(keys.currentKey);
-              }}
-              className="max-w-[300px]"
-            >
-              {allList?.length ? (
-                allList.map((v: ListItem) => {
-                  return <DropdownItem key={v.type}>{v.title}</DropdownItem>;
-                })
-              ) : (
-                <div></div>
-              )}
-            </DropdownMenu>
-          </Dropdown>
-        </ButtonGroup>
-        <ThemeSwitcher />
-      </div>
-      <div ref={remioLikesRef} className="p-4 bg-mio-main">
-        <h1 className="text-3xl md:text-5xl font-extrabold pt-4 pb-8 text-center">
-          {aList?.title || "喜好生成表"}
-        </h1>
-        <ul className="grid grid-cols-2 md:grid-cols-5 gap-4 w-full">
-          {aList?.data?.length &&
-            aList.data.map((v: any, index: number) => {
-              return (
-                <Card
-                  onSelect={onSelect}
-                  setActive={setActive}
-                  data={{ ...v, index }}
-                  type={selectedKey}
-                  key={`${index}:${selectedKey}`}
-                />
-              );
-            })}
-        </ul>
-        <div className="mio-copyright flex min-h-10 md:bottom-0 bottom-[-24px] flex-nowrap gap-1 items-end opacity-65 text-xs">
+    <div className="pt-4 mx-auto w-full md:w-3/5 h-full">
+      <div ref={remioLikesRef} className="bg-mio-main relative px-4 pt-6">
+        <div
+          className="text-end flex items-center justify-end gap-3 mio-image-hidden"
+          data-html2canvas-ignore
+        >
+          <ButtonGroup variant="flat">
+            <Button size="sm">切换表</Button>
+            <Dropdown placement="bottom-end">
+              <DropdownTrigger>
+                <Button size="sm" isIconOnly>
+                  <ChevronDownIcon />
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu
+                disallowEmptySelection
+                aria-label="Merge options"
+                selectedKeys={selectedKey}
+                selectionMode="single"
+                onSelectionChange={(keys: any) => {
+                  storage.l.set("mio-likes-active", keys.currentKey);
+                  setSearchData([]);
+                  setSelectedKey(keys.currentKey);
+                }}
+                className="max-w-[300px]"
+              >
+                {allList?.length ? (
+                  allList.map((v: ListItem) => {
+                    return <DropdownItem key={v.type}>{v.title}</DropdownItem>;
+                  })
+                ) : (
+                  <div></div>
+                )}
+              </DropdownMenu>
+            </Dropdown>
+          </ButtonGroup>
+          <ThemeSwitcher />
+        </div>
+        <div>
+          <h1 className="text-3xl md:text-5xl font-extrabold pt-4 pb-8 text-center">
+            {aList?.title || "喜好生成表"}
+          </h1>
+          <ul className="grid grid-cols-2 md:grid-cols-5 gap-4 w-full">
+            {aList?.data?.length &&
+              aList.data.map((v: any, index: number) => {
+                return (
+                  <Card
+                    onSelect={onSelect}
+                    setActive={setActive}
+                    data={{ ...v, index }}
+                    type={selectedKey}
+                    key={`${index}:${selectedKey}`}
+                  />
+                );
+              })}
+          </ul>
+        </div>
+        <div className="mio-copyright mb-20 flex min-h-10 md:bottom-0 bottom-[-24px] flex-nowrap gap-1 items-end opacity-65 text-xs">
           <span>like.kasuie.cc</span>・
           <div className="flex items-center gap-[2px]">
             <span>数据源</span>
@@ -225,18 +223,18 @@ export const List = ({ allList }: { allList: Array<ListItem> }) => {
           </div>
           ・<span>禁止商业，盈利用途</span>
         </div>
-      </div>
-      <div className="pt-2 text-center relative">
-        <Button
-          color="success"
-          className="min-w-32"
-          endContent={<ImageIcon />}
-          onClick={() => toImage()}
-          isLoading={isLoading}
-          data-html2canvas-ignore
-        >
-          生成图片
-        </Button>
+        <div className="absolute text-center bottom-[-60px] left-0 right-0 mio-image-hidden w-full m-auto">
+          <Button
+            color="success"
+            className="min-w-32"
+            endContent={<ImageIcon />}
+            onClick={() => toImage()}
+            isLoading={isLoading}
+            data-html2canvas-ignore
+          >
+            生成图片
+          </Button>
+        </div>
       </div>
       <Modal
         backdrop={"blur"}
@@ -255,7 +253,14 @@ export const List = ({ allList }: { allList: Array<ListItem> }) => {
             ? (onClose) => (
                 <>
                   <ModalBody className="py-0 mt-8">
-                    <Image src={result} alt="result" />
+                    <Image
+                      src={result}
+                      classNames={{
+                        wrapper: "w-full !max-w-none",
+                      }}
+                      className="object-contain h-[400px] md:h-full w-full"
+                      alt="result"
+                    />
                   </ModalBody>
                   <ModalFooter>
                     <p className="md:hidden">长按图片即可保存或分享~</p>
@@ -267,7 +272,7 @@ export const List = ({ allList }: { allList: Array<ListItem> }) => {
                       isIconOnly
                       className=" hidden md:flex"
                       onPress={() => {
-                        download(result, "个人喜好表");
+                        download(result, aList?.title || "个人喜好表");
                       }}
                     >
                       <Download />
@@ -281,80 +286,14 @@ export const List = ({ allList }: { allList: Array<ListItem> }) => {
                     {(aList?.data && aList.data[active].label) || "请选择"}
                   </ModalHeader>
                   <ModalBody>
-                    <div>
-                      <Input
-                        variant="faded"
-                        value={keywords}
-                        classNames={{
-                          label: "text-black/50 dark:text-white/90",
-                          input: [
-                            "bg-transparent",
-                            "text-mio-text-default/90",
-                            "placeholder:text-mio-text-default/60",
-                          ],
-                          innerWrapper: "bg-transparent",
-                          inputWrapper: [
-                            "bg-default-200/30",
-                            "dark:bg-default/40",
-                            "backdrop-blur-xl",
-                            "backdrop-saturate-200",
-                            "hover:bg-default-200/70",
-                            "dark:hover:bg-default/70",
-                            "group-data-[focused=true]:bg-default-200/50",
-                            "dark:group-data-[focused=true]:bg-default/60",
-                            "!cursor-text",
-                          ],
-                        }}
-                        placeholder="输入关键词进行搜索..."
-                        startContent={
-                          <Search className="pointer-events-none flex-shrink-0" />
-                        }
-                        onKeyDown={({ key }: any) => onSearch(key)}
-                        onBlur={() => onSearch("Enter")}
-                        onValueChange={setKeywords}
-                      />
-                    </div>
-                    <div className="w-full mio-scroll flex flex-wrap max-h-[500px] overflow-y-auto">
-                      {searchData ? (
-                        searchData.map((v: any, index: number) => {
-                          return (
-                            <div
-                              key={index}
-                              onClick={() => {
-                                setTemp(v);
-                              }}
-                              className={clsx(
-                                "mio-col-2 cursor-pointer border duration-300 rounded border-transparent sm:mio-col-2 md:mio-col-2 lg:mio-col-3 xl:mio-col-5 2xl:mio-col-5 p-1",
-                                {
-                                  "!border-pink-400": v?.id == temp?.id,
-                                }
-                              )}
-                            >
-                              <div className="flex flex-1 mb-1 item-center justify-center">
-                                <Image
-                                  className="h-full min-h-28 object-cover cursor-pointer"
-                                  radius="sm"
-                                  src={v?.covers?.large || ""}
-                                  alt={v?.name_cn || "name"}
-                                />
-                              </div>
-                              <div
-                                className={clsx(
-                                  "text-center text-xs line-clamp-2",
-                                  {
-                                    "text-pink-400": v?.id == temp?.id,
-                                  }
-                                )}
-                              >
-                                {v.name_cn || v.name}
-                              </div>
-                            </div>
-                          );
-                        })
-                      ) : isLoading ? (
-                        <Loader />
-                      ) : null}
-                    </div>
+                    <Search
+                      setKeywords={setKeywords}
+                      keywords={keywords}
+                      onSearch={onSearch}
+                      setTemp={setTemp}
+                      isLoading={isLoading}
+                      data={searchData}
+                    />
                   </ModalBody>
                   <ModalFooter>
                     <Button color="danger" variant="light" onPress={onClose}>
