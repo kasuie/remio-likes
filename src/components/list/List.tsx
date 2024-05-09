@@ -2,7 +2,7 @@
  * @Author: kasuie
  * @Date: 2024-04-26 14:55:29
  * @LastEditors: kasuie
- * @LastEditTime: 2024-05-08 18:05:15
+ * @LastEditTime: 2024-05-09 09:18:00
  * @Description:
  */
 "use client";
@@ -159,7 +159,10 @@ export const List = ({ allList }: { allList: Array<ListItem> }) => {
 
   return (
     <div className="pt-4 mx-auto w-full md:w-3/5 h-full">
-      <div ref={remioLikesRef} className="bg-mio-main relative px-4 pt-6">
+      <div
+        ref={remioLikesRef}
+        className="bg-[rgb(var(--mio-main))] relative px-4 pt-6"
+      >
         <div
           className="text-end flex items-center justify-end gap-3 mio-image-hidden"
           data-html2canvas-ignore
