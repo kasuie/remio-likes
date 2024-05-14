@@ -2,7 +2,7 @@
  * @Author: kasuie
  * @Date: 2024-05-08 16:09:34
  * @LastEditors: kasuie
- * @LastEditTime: 2024-05-08 16:27:29
+ * @LastEditTime: 2024-05-14 17:14:05
  * @Description:
  */
 import { Image } from "@nextui-org/image";
@@ -10,7 +10,7 @@ import { Input } from "@nextui-org/input";
 import { clsx } from "@kasuie/utils";
 import { Search as SearchIcon } from "../icon";
 import { Loader } from "../loader/Loader";
-import { useState } from "react";
+import { createRef, useEffect, useState } from "react";
 
 export const Search = ({
   onSearch,
@@ -28,6 +28,12 @@ export const Search = ({
   setKeywords: any;
 }) => {
   const [temp, setMTemp]: any = useState({ id: null });
+  const contentRef: any = createRef();
+
+  // useEffect(() => {
+  //   if (contentRef?.current) {
+  //   }
+  // }, [contentRef]);
 
   return (
     <>
@@ -66,7 +72,7 @@ export const Search = ({
           onValueChange={setKeywords}
         />
       </div>
-      <div className="w-full mio-scroll flex flex-wrap max-h-[500px] overflow-y-auto">
+      <div ref={contentRef} className="w-full mio-scroll flex flex-wrap max-h-[500px] overflow-y-auto">
         {data ? (
           data.map((v: any, index: number) => {
             return (
