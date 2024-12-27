@@ -4,6 +4,17 @@ on:
     branches: [main]
 
   workflow_dispatch:
+    inputs:
+      push:
+        description: push
+        required: true
+        default: true
+        type: boolean
+      restart:
+        description: Redeploy
+        required: false
+        default: false
+        type: boolean
 
 jobs: # 执行的一项或 多项任务
   build-and-push:
@@ -12,34 +23,44 @@ jobs: # 执行的一项或 多项任务
       matrix:
         node-version: [20.x]
     steps:
-      - name: Set state
-        run: |
-          echo "DOCKER_NAMESPACE=kasuie" >> $GITHUB_ENV
-          echo "IMAGE_NAME=image-web-likes" >> $GITHUB_ENV
-          echo "IMAGE_TAG=${{secrets.ALI_DOCKER_REGISTRY}}:${{github.sha}}" >> $GITHUB_ENV
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Login to Ali Docker
-        uses: aliyun/acr-login@v1
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
         with:
-          login-server: ${{secrets.ALI_DOCKER_REGISTRY}}
-          username: ${{secrets.ALI_DOCKER_USERNAME}}
-          password: ${{secrets.ALI_DOCKER_PASSWORD}}
+          images: |
+            ${{ secrets.ALI_DOCKER_REGISTRY }}
+          tags: |
+            type=raw,value=latest
+            type=semver,pattern={{version}}
+      - name: Login to Git Docker Hub
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ secrets.ALI_DOCKER_REGISTRY }}
+          username: ${{ secrets.ALI_DOCKER_USERNAME }}
+          password: ${{ secrets.ALI_DOCKER_PASSWORD }}
       - name: Build and push Docker Image
         uses: docker/build-push-action@v5
         with:
           file: ./Dockerfile
-          push: true
-          tags: ${{env.IMAGE_TAG}}
+          push: ${{ github.event_name != 'workflow_dispatch' || inputs.push }}
+          platforms: |
+            linux/amd64
+          tags: |
+            ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            VERSION=${{ steps.meta.outputs.version }}
   pull-and-restart:
     needs: build-and-push
     runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.restart }}
     steps:
-      - name: Set state
-        run: |
-          echo "DOCKER_NAMESPACE=kasuie" >> $GITHUB_ENV
-          echo "IMAGE_NAME=image-web-likes" >> $GITHUB_ENV
-          echo "IMAGE_TAG=${{secrets.ALI_DOCKER_REGISTRY}}:${{github.sha}}" >> $GITHUB_ENV
       - name: Login Server and Start
         uses: appleboy/ssh-action@master
         with:
@@ -47,8 +68,8 @@ jobs: # 执行的一项或 多项任务
           username: ${{ secrets.REMOTE_USERNAME }}
           key: ${{ secrets.PRIVATE_KEY }}
           script: |
-            cd /usr/local/docker/web/
+            cd /usr/docker/apps/
             docker login -u=${{secrets.ALI_DOCKER_USERNAME}} -p=${{secrets.ALI_DOCKER_PASSWORD}} ${{secrets.ALI_DOCKER_REGISTRY}}
-            docker stop web-likes && docker rm web-likes
+            docker-compose stop web-likes && docker-compose rm -f web-likes
             docker image rm $(docker image ls ${{secrets.ALI_DOCKER_REGISTRY}} -q) || echo "删除镜像异常"
-            docker run --name web-likes -p 3003:3000 --env-file .env -d ${{env.IMAGE_TAG}}
+            docker-compose pull web-likes && docker-compose up -d web-likes
