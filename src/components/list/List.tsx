@@ -2,7 +2,7 @@
  * @Author: kasuie
  * @Date: 2024-04-26 14:55:29
  * @LastEditors: kasuie
- * @LastEditTime: 2024-05-09 09:39:54
+ * @LastEditTime: 2024-12-27 11:01:53
  * @Description:
  */
 "use client";
@@ -228,7 +228,7 @@ export const List = ({ allList }: { allList: Array<ListItem> }) => {
             color="success"
             className="min-w-32"
             endContent={<ImageIcon />}
-            onClick={() => toImage()}
+            onPress={() => toImage()}
             isLoading={isLoading}
             data-html2canvas-ignore
           >

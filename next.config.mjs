@@ -2,15 +2,15 @@
  * @Author: kasuie
  * @Date: 2024-04-26 11:51:38
  * @LastEditors: kasuie
- * @LastEditTime: 2024-04-29 14:57:04
+ * @LastEditTime: 2024-12-27 10:42:25
  * @Description:
  */
 /** @type {import('next').NextConfig} */
-import nextPWA from 'next-pwa';
+import nextPWA from "next-pwa";
 const isProd = process.env.NODE_ENV === "production";
 
 const withPWA = nextPWA({
-  dest: 'public',
+  dest: "public",
   register: true,
   skipWaiting: true,
   disable: !isProd,
@@ -18,7 +18,6 @@ const withPWA = nextPWA({
 
 const nextConfig = {
   output: "standalone",
-  swcMinify: true,
   onDemandEntries: {
     maxInactiveAge: 25 * 1000,
     pagesBufferLength: 3,
